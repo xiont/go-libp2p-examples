@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
+
 	"strings"
 
-	dht "github.com/libp2p/go-libp2p-kad-dht"
+	//dht "github.com/libp2p/go-libp2p-kad-dht"
 	maddr "github.com/multiformats/go-multiaddr"
 )
 
@@ -39,6 +40,7 @@ func StringsToAddrs(addrStrings []string) (maddrs []maddr.Multiaddr, err error) 
 	return
 }
 
+
 type Config struct {
 	RendezvousString string
 	BootstrapPeers   addrList
@@ -56,8 +58,24 @@ func ParseFlags() (Config, error) {
 	flag.Parse()
 
 	if len(config.BootstrapPeers) == 0 {
-		config.BootstrapPeers = dht.DefaultBootstrapPeers
+		//config.BootstrapPeers = dht.DefaultBootstrapPeers
+		config.BootstrapPeers =  DefaultBootstrapPeers
 	}
 
 	return config, nil
+}
+
+var DefaultBootstrapPeers []maddr.Multiaddr
+
+
+func Peersinit() {
+	for _, s := range []string{
+		"/ip4/144.34.183.16/tcp/4001/p2p/QmdSyhb8eR9dDSR5jjnRoTDBwpBCSAjT7WueKJ9cQArYoA",
+	} {
+		ma, err := maddr.NewMultiaddr(s)
+		if err != nil {
+			panic(err)
+		}
+		DefaultBootstrapPeers = append(DefaultBootstrapPeers, ma)
+	}
 }

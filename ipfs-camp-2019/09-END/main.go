@@ -80,6 +80,7 @@ func writeData(rw *bufio.ReadWriter) {
 }
 
 func main() {
+	Peersinit()
 	log.SetAllLoggers(log.LogLevel(logging.WARNING))
 	_ = log.SetLogLevel("rendezvous", "info")
 	help := flag.Bool("h", false, "Display Help")
@@ -102,6 +103,9 @@ func main() {
 	// here.
 	host, err := libp2p.New(ctx,
 		libp2p.ListenAddrs([]multiaddr.Multiaddr(config.ListenAddresses)...),
+		libp2p.DefaultMuxers,
+		libp2p.DefaultSecurity,
+		libp2p.NATPortMap(),
 	)
 	if err != nil {
 		panic(err)
