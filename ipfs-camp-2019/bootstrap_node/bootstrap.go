@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/libp2p/go-libp2p"
+	"github.com/libp2p/go-libp2p-core/crypto"
+	mrand "math/rand"
+
 	//"github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/routing"
@@ -32,20 +35,20 @@ func main() {
 	fmt.Printf("[*] Listening on: %s with port: %d\n", *listenHost, *port)
 
 	ctx := context.Background()
-	//r := mrand.New(mrand.NewSource(int64(*port)))
+	r := mrand.New(mrand.NewSource(int64(*port)))
 
 	// Creates a new RSA key pair for this host.
-	//prvKey, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
-	//if err != nil {
-	//	panic(err)
-	//}
+	prvKey, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
+	if err != nil {
+		panic(err)
+	}
 
 	muxers := libp2p.ChainOptions(
 		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
 		libp2p.Muxer("/mplex/6.7.0", mplex.DefaultTransport),
 	)
 
-	security := libp2p.Security(secio.ID, secio.New)
+	//security := libp2p.Security(secio.ID, secio.New)
 	// 0.0.0.0 will listen on any interface device.
 	sourceMultiAddr, _ := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/%s/tcp/%d", *listenHost, *port))
 
@@ -62,9 +65,9 @@ func main() {
 	host, err := libp2p.New(
 		ctx,
 		libp2p.ListenAddrs(sourceMultiAddr),
-		//libp2p.Identity(prvKey),
+		libp2p.Identity(prvKey),
 		muxers,
-		security,
+		//security,
 		routing,
 		libp2p.NATPortMap(),
 	)

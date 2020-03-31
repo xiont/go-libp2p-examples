@@ -119,7 +119,7 @@ func main() {
 	for _, addr := range host.Addrs() {
 		fmt.Println("Listening on", addr)
 	}
-	targetAddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/0.0.0.0/tcp/4001/p2p/%s",target))
+	targetAddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/144.34.183.16/tcp/4001/p2p/%s",target))
 	if err != nil {
 		panic(err)
 	}
