@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/multiformats/go-multiaddr"
 	"os"
 	"os/signal"
 	"syscall"
@@ -99,22 +100,22 @@ func main() {
 		fmt.Println("Listening on", addr)
 	}
 
-	//targetAddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/63785/p2p/QmWjz6xb8v9K4KnYEwP5Yk75k5mMBCehzWFLCvvQpYxF3d")
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//targetInfo, err := peer.AddrInfoFromP2pAddr(targetAddr)
-	//if err != nil {
-	//	panic(err)
-	//}
+	targetAddr, err := multiaddr.NewMultiaddr("/ip4/144.34.183.16/tcp/4001/p2p/QmP2C45o2vZfy1JXWFZDUEzrQCigMtd4r3nesvArV8dFKd")
+	if err != nil {
+		panic(err)
+	}
 
-	//err = host.Connect(ctx, *targetInfo)
-	//if err != nil {
-	//	panic(err)
-	//}
+	targetInfo, err := peer.AddrInfoFromP2pAddr(targetAddr)
+	if err != nil {
+		panic(err)
+	}
 
-	//fmt.Println("Connected to", targetInfo.ID)
+	err = host.Connect(ctx, *targetInfo)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Connected to", targetInfo.ID)
 
 	mdns, err := discovery.NewMdnsService(ctx, host, time.Second*10, "")
 	if err != nil {
