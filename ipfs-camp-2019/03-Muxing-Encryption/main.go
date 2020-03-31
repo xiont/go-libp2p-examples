@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	mplex "github.com/libp2p/go-libp2p-mplex"
+	secio "github.com/libp2p/go-libp2p-secio"
+	yamux "github.com/libp2p/go-libp2p-yamux"
 
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p-core/peer"
@@ -21,22 +24,33 @@ func main() {
 	)
 
 	// TODO: add a libp2p.Security instance and some libp2p.Muxer's
+	security := libp2p.Security(secio.ID, secio.New)
+
+	muxers := libp2p.ChainOptions(
+		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
+		libp2p.Muxer("/mplex/6.7.0", mplex.DefaultTransport),
+	)
 
 	listenAddrs := libp2p.ListenAddrStrings(
 		"/ip4/0.0.0.0/tcp/0",
 		"/ip4/0.0.0.0/tcp/0/ws",
 	)
 
-	host, err := libp2p.New(ctx, transports, listenAddrs)
+	host, err := libp2p.New(ctx,
+		transports,
+		listenAddrs,
+		security,
+		muxers)
 	if err != nil {
 		panic(err)
 	}
 
+	fmt.Printf("host.id:%s\n",host.ID())
 	for _, addr := range host.Addrs() {
 		fmt.Println("Listening on", addr)
 	}
 
-	targetAddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/63785/p2p/QmWjz6xb8v9K4KnYEwP5Yk75k5mMBCehzWFLCvvQpYxF3d")
+	targetAddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/59675/p2p/QmchtgByxcQPdVrwnq2KneE3ako5o65MyiWdYDrBjMpVDP")
 	if err != nil {
 		panic(err)
 	}

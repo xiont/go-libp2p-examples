@@ -47,12 +47,14 @@ func main() {
 	}
 
 	// TODO: Register a stream handler for our protocol!
+	host.SetStreamHandler(protocol, chatHandler)
 
 	for _, addr := range host.Addrs() {
 		fmt.Println("Listening on", addr)
 	}
 
-	targetAddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/63785/p2p/QmWjz6xb8v9K4KnYEwP5Yk75k5mMBCehzWFLCvvQpYxF3d")
+	//----------connect to remote peer-------------->>>>>>>>>>
+	targetAddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/59675/p2p/QmchtgByxcQPdVrwnq2KneE3ako5o65MyiWdYDrBjMpVDP")
 	if err != nil {
 		panic(err)
 	}
@@ -68,6 +70,7 @@ func main() {
 	}
 
 	fmt.Println("Connected to", targetInfo.ID)
+	//----------connect to remote peer--------------<<<<<<<<<<
 
 	// TODO: Implement a simple read loop to read user input and send messages
 	// to peers we are connected to that support our protocol.

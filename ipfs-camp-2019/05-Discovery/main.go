@@ -57,7 +57,7 @@ func main() {
 		fmt.Println("Listening on", addr)
 	}
 
-	targetAddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/63785/p2p/QmWjz6xb8v9K4KnYEwP5Yk75k5mMBCehzWFLCvvQpYxF3d")
+	targetAddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/59675/p2p/QmchtgByxcQPdVrwnq2KneE3ako5o65MyiWdYDrBjMpVDP")
 	if err != nil {
 		panic(err)
 	}
@@ -74,6 +74,7 @@ func main() {
 
 	fmt.Println("Connected to", targetInfo.ID)
 
+	// TODO: Implement a simple read loop to read user input and send messages
 	donec := make(chan struct{}, 1)
 	go chatInputLoop(ctx, host, donec)
 

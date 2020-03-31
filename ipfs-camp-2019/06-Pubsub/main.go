@@ -57,6 +57,8 @@ func main() {
 		"/ip4/0.0.0.0/tcp/0/ws",
 	)
 
+
+	//---------------dht----------------->>>>>>>>>>>>>>>>>>
 	var dht *kaddht.IpfsDHT
 	newDHT := func(h host.Host) (routing.PeerRouting, error) {
 		var err error
@@ -64,6 +66,7 @@ func main() {
 		return dht, err
 	}
 	routing := libp2p.Routing(newDHT)
+	//-------------dht-------------------<<<<<<<<<<<<<<<<<<
 
 	host, err := libp2p.New(
 		ctx,
@@ -85,7 +88,7 @@ func main() {
 		fmt.Println("Listening on", addr)
 	}
 
-	targetAddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/63785/p2p/QmWjz6xb8v9K4KnYEwP5Yk75k5mMBCehzWFLCvvQpYxF3d")
+	targetAddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/59675/p2p/QmchtgByxcQPdVrwnq2KneE3ako5o65MyiWdYDrBjMpVDP")
 	if err != nil {
 		panic(err)
 	}

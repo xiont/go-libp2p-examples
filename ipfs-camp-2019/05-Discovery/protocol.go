@@ -52,6 +52,7 @@ func chatInputLoop(ctx context.Context, h host.Host, donec chan struct{}) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		msg := scanner.Text()
+		// **********
 		for _, peer := range h.Network().Peers() {
 			if _, err := h.Peerstore().SupportsProtocols(peer, string(chatProtocol)); err == nil {
 				s, err := h.NewStream(ctx, peer, chatProtocol)
