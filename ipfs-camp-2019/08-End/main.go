@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"github.com/multiformats/go-multiaddr"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -33,8 +35,20 @@ func (m *mdnsNotifee) HandlePeerFound(pi peer.AddrInfo) {
 }
 
 func main() {
+	var target string
+	flag.StringVar(&target,"d","","target peer to dial")
+
+	flag.Parse()
+
+	if target == "" {
+		log.Println("please enter bootstrap node!")
+		return
+	}
+
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
 
 
 
@@ -51,6 +65,11 @@ func main() {
 	)
 
 	security := libp2p.Security(secio.ID, secio.New)
+
+	//prvKey, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	listenAddrs := libp2p.ListenAddrStrings(
 		"/ip4/0.0.0.0/tcp/0",
@@ -69,6 +88,7 @@ func main() {
 		ctx,
 		transports,
 		listenAddrs,
+		//libp2p.Identity(prvKey),
 		muxers,
 		security,
 		routing,
@@ -99,8 +119,7 @@ func main() {
 	for _, addr := range host.Addrs() {
 		fmt.Println("Listening on", addr)
 	}
-
-	targetAddr, err := multiaddr.NewMultiaddr("/ip4/144.34.183.16/tcp/4001/p2p/QmP2C45o2vZfy1JXWFZDUEzrQCigMtd4r3nesvArV8dFKd")
+	targetAddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/0.0.0.0/tcp/4001/p2p/%s",target))
 	if err != nil {
 		panic(err)
 	}
