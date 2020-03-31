@@ -1,21 +1,14 @@
 package main
+
 import (
 	"context"
 	"flag"
 	"fmt"
 	"github.com/libp2p/go-libp2p"
-	"github.com/libp2p/go-libp2p-core/crypto"
-	mrand "math/rand"
-
-	//"github.com/libp2p/go-libp2p-core/crypto"
-	"github.com/libp2p/go-libp2p-core/host"
-	"github.com/libp2p/go-libp2p-core/routing"
-	kaddht "github.com/libp2p/go-libp2p-kad-dht"
-	mplex "github.com/libp2p/go-libp2p-mplex"
-	//secio "github.com/libp2p/go-libp2p-secio"
-	yamux "github.com/libp2p/go-libp2p-yamux"
+	"github.com/libp2p/go-libp2p-crypto"
+	"github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/multiformats/go-multiaddr"
-	//mrand "math/rand"
+	mrand "math/rand"
 	"os"
 )
 
@@ -43,22 +36,8 @@ func main() {
 		panic(err)
 	}
 
-	muxers := libp2p.ChainOptions(
-		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
-		libp2p.Muxer("/mplex/6.7.0", mplex.DefaultTransport),
-	)
-
-	//security := libp2p.Security(secio.ID, secio.New)
 	// 0.0.0.0 will listen on any interface device.
 	sourceMultiAddr, _ := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/%s/tcp/%d", *listenHost, *port))
-
-	var dht *kaddht.IpfsDHT
-	newDHT := func(h host.Host) (routing.PeerRouting, error) {
-		var err error
-		dht, err = kaddht.New(ctx, h)
-		return dht, err
-	}
-	routing := libp2p.Routing(newDHT)
 
 	// libp2p.New constructs a new libp2p Host.
 	// Other options can be added here.
@@ -66,23 +45,15 @@ func main() {
 		ctx,
 		libp2p.ListenAddrs(sourceMultiAddr),
 		libp2p.Identity(prvKey),
-		muxers,
-		//security,
-		routing,
-		libp2p.NATPortMap(),
 	)
 
 	if err != nil {
 		panic(err)
 	}
 
-	//_, err = kaddht.New(ctx, host)
-	//if err != nil {
-	//	panic(err)
-	//}
-
-	for _, addr := range host.Addrs() {
-		fmt.Println("Listening on", addr)
+	_, err = dht.New(ctx, host)
+	if err != nil {
+		panic(err)
 	}
 	fmt.Println("")
 	fmt.Printf("[*] Your Bootstrap ID Is: /ip4/%s/tcp/%v/p2p/%s\n", *listenHost, *port, host.ID().Pretty())
