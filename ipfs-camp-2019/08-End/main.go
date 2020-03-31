@@ -23,6 +23,7 @@ import (
 	"github.com/libp2p/go-libp2p/p2p/discovery"
 	tcp "github.com/libp2p/go-tcp-transport"
 	ws "github.com/libp2p/go-ws-transport"
+	//logging "github.com/whyrusleeping/go-logging"
 )
 
 type mdnsNotifee struct {
@@ -36,7 +37,10 @@ func (m *mdnsNotifee) HandlePeerFound(pi peer.AddrInfo) {
 
 func main() {
 	var target string
+	var port string
+	flag.StringVar(&port,"p","4001","target port")
 	flag.StringVar(&target,"d","","target peer to dial")
+
 
 	flag.Parse()
 
@@ -97,6 +101,42 @@ func main() {
 	)
 
 
+	// Start a DHT, for use in peer discovery. We can't just make a new DHT
+	// client because we want each peer to maintain its own local copy of the
+	// DHT, so that the bootstrapping node of the DHT can go down without
+	// inhibiting future peer discovery.
+	//kademliaDHT, err := kaddht.New(ctx, host)
+	//if err != nil {
+	//	panic(err)
+	//}
+
+	// Bootstrap the DHT. In the default configuration, this spawns a Background
+	// thread that will refresh the peer table every five minutes.
+	//fmt.Printf("Bootstrapping the DHT")
+	//if err = kademliaDHT.Bootstrap(ctx); err != nil {
+	//	panic(err)
+	//}
+
+	//connection to other node
+	targetAddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/144.34.183.16/tcp/%s/p2p/%s",port,target))
+	if err != nil {
+		panic(err)
+	}
+
+	targetInfo, err := peer.AddrInfoFromP2pAddr(targetAddr)
+	if err != nil {
+		panic(err)
+	}
+
+	err = host.Connect(ctx, *targetInfo)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Connected to", targetInfo.ID)
+	////////////
+
+
+
 
 
 
@@ -119,22 +159,7 @@ func main() {
 	for _, addr := range host.Addrs() {
 		fmt.Println("Listening on", addr)
 	}
-	targetAddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/144.34.183.16/tcp/4001/p2p/%s",target))
-	if err != nil {
-		panic(err)
-	}
 
-	targetInfo, err := peer.AddrInfoFromP2pAddr(targetAddr)
-	if err != nil {
-		panic(err)
-	}
-
-	err = host.Connect(ctx, *targetInfo)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Connected to", targetInfo.ID)
 
 	mdns, err := discovery.NewMdnsService(ctx, host, time.Second*10, "")
 	if err != nil {
